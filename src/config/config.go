@@ -46,6 +46,7 @@ type Config struct {
 	WriteTimeout   int         `json:"write_timeout"`
 	MaxHeadersSize int         `json:"max_header_bytes"`
 	HTTPRoot       string      `json:"http_root"`
+	flagConfigPath string
 }
 
 // MergedConfig is used for merging one config over the other. I need the zero value
@@ -211,6 +212,9 @@ func (cfg *Config) merge(merged *MergedConfig) {
 // UserConfigPath returns the full path to the place where the user's configuration
 // file should be
 func (cfg *Config) UserConfigPath() string {
+	if cfg.flagConfigPath != "" {
+		return cfg.flagConfigPath
+	}
 	if len(cfg.UserPath) > 0 {
 		if filepath.IsAbs(cfg.UserPath) {
 			return filepath.Join(cfg.UserPath, ConfigName)
@@ -253,4 +257,10 @@ func (cfg *Config) CopyDefaultOverUser() error {
 	defaultConfigDir := filepath.Dir(cfg.DefaultConfigPath())
 	defaultConfig := filepath.Join(defaultConfigDir, ConfigName)
 	return helpers.Copy(defaultConfig, userConfig)
+}
+
+// SetConfigPath changes the location of the configuration file which would be read and
+// parsed.
+func (cfg *Config) SetConfigPath(path string) {
+	cfg.flagConfigPath = path
 }

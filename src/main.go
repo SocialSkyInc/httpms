@@ -27,12 +27,18 @@ var (
 
 	// Debug is populated by an command line argument.
 	Debug bool
+
+	// ConfigPath represents the location of the config file which will be used
+	// for running this instance.
+	ConfigPath string
 )
 
 func init() {
 	pidUsage := "Pidfile. Default is [user_path]/pidfile.pid"
 	pidDefault := "pidfile.pid"
 	flag.StringVar(&PidFile, "p", pidDefault, pidUsage)
+
+	flag.StringVar(&ConfigPath, "c", "", "Path to the configuration file")
 
 	flag.BoolVar(&Debug, "D", false, "Debug mode. Will log everything to the stdout.")
 }
@@ -106,6 +112,7 @@ func getLibrary(ctx context.Context, userPath string,
 func ParseConfigAndStartWebserver(projRoot string) error {
 
 	var cfg config.Config
+	cfg.SetConfigPath(ConfigPath)
 	err := cfg.FindAndParse()
 
 	if err != nil {
